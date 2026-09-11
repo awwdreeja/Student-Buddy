@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSA Quiz – QuizVerse</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --accent: #4f8cff; --accent2: #7eb3ff; --bg: #0a0a0f; --surface: #13131a; --surface2: #1c1c27; --text: #f0f0f5; --muted: #7a7a9a; --border: rgba(255,255,255,0.07); --correct: #3ecf72; --wrong: #ff5252; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; }
+  .grid-bg { position:fixed; inset:0; z-index:0; background-image: linear-gradient(rgba(79,140,255,0.04) 1px,transparent 1px), linear-gradient(90deg,rgba(79,140,255,0.04) 1px,transparent 1px); background-size:60px 60px; }
+  nav { position:relative; z-index:10; padding:1.25rem 2.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:1rem; }
+  .back-btn { display:inline-flex; align-items:center; gap:0.4rem; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:0.45rem 1rem; color:var(--text); text-decoration:none; font-size:0.85rem; transition:all 0.2s; }
+  .back-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .topic-badge { background:rgba(79,140,255,0.12); color:var(--accent); border:1px solid rgba(79,140,255,0.25); border-radius:20px; padding:0.3rem 0.9rem; font-size:0.75rem; font-family:'Syne',sans-serif; font-weight:700; letter-spacing:2px; text-transform:uppercase; }
+  main { position:relative; z-index:10; padding:2.5rem; max-width:780px; margin:0 auto; }
+  .topic-header { margin-bottom:2.5rem; }
+  .topic-header h1 { font-family:'Syne',sans-serif; font-size:2.2rem; font-weight:800; letter-spacing:-1px; margin-top:0.75rem; }
+  .topic-header p { color:var(--muted); font-size:0.95rem; margin-top:0.4rem; }
+  .progress-bar-wrap { background:var(--surface2); border-radius:99px; height:6px; margin-bottom:2rem; overflow:hidden; }
+  .progress-bar { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:99px; transition:width 0.4s ease; }
+  .q-counter { font-size:0.8rem; color:var(--muted); margin-bottom:0.75rem; font-family:'Syne',sans-serif; }
+  .question-card { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:2rem; margin-bottom:1.25rem; }
+  .question-text { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:600; line-height:1.5; margin-bottom:1.5rem; }
+  .options { display:flex; flex-direction:column; gap:0.65rem; }
+  .option { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:0.85rem 1.1rem; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:0.75rem; font-size:0.95rem; }
+  .option:hover { border-color:rgba(79,140,255,0.4); background:rgba(79,140,255,0.06); }
+  .option.selected { border-color:var(--accent); background:rgba(79,140,255,0.1); }
+  .option.correct { border-color:var(--correct); background:rgba(62,207,114,0.1); color:var(--correct); }
+  .option.wrong { border-color:var(--wrong); background:rgba(255,82,82,0.1); color:var(--wrong); }
+  .option-letter { width:28px; height:28px; border-radius:7px; background:rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-size:0.75rem; font-weight:700; flex-shrink:0; }
+  .explanation { margin-top:1rem; background:rgba(79,140,255,0.07); border:1px solid rgba(79,140,255,0.2); border-radius:10px; padding:0.9rem 1.1rem; font-size:0.88rem; color:var(--accent2); display:none; }
+  .btn-row { display:flex; gap:0.75rem; margin-top:1.25rem; }
+  .btn { padding:0.7rem 1.5rem; border-radius:10px; border:none; cursor:pointer; font-family:'Syne',sans-serif; font-size:0.9rem; font-weight:600; transition:all 0.2s; }
+  .btn-primary { background:var(--accent); color:#fff; }
+  .btn-primary:hover { background:var(--accent2); }
+  .btn-outline { background:transparent; border:1px solid var(--border); color:var(--text); }
+  .btn-outline:hover { border-color:var(--accent); color:var(--accent); }
+  .score-card { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:2.5rem; text-align:center; display:none; }
+  .score-num { font-family:'Syne',sans-serif; font-size:4rem; font-weight:800; color:var(--accent); }
+  .score-label { color:var(--muted); font-size:1rem; margin-top:0.3rem; }
+  .score-msg { font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:600; margin-top:1rem; }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<nav>
+  <a class="back-btn" href="dashboard.html">← Dashboard</a>
+  <span class="topic-badge">⚙ Technical</span>
+</nav>
+<main>
+  <div class="topic-header">
+    <div>🧩</div>
+    <h1>Data Structures & Algorithms</h1>
+    <p>Test your understanding of DSA concepts, complexity, and problem solving.</p>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+  <div class="q-counter" id="qCounter">Question 1 of 10</div>
+  <div id="quizArea"></div>
+  <div class="score-card" id="scoreCard">
+    <div class="score-num" id="scoreNum"></div>
+    <div class="score-label" id="scoreLabel"></div>
+    <div class="score-msg" id="scoreMsg"></div>
+    <div class="btn-row" style="justify-content:center;margin-top:1.5rem">
+      <button class="btn btn-primary" onclick="restartQuiz()">Try Again</button>
+      <a class="btn btn-outline" href="dashboard.html">Dashboard</a>
+    </div>
+  </div>
+</main>
+<script>
+const questions = [
+  { q: "What is the time complexity of binary search?", opts: ["O(n)", "O(log n)", "O(n²)", "O(1)"], ans: 1, exp: "Binary search halves the search space each step, giving O(log n) time complexity." },
+  { q: "Which data structure uses LIFO (Last In First Out) order?", opts: ["Queue", "Stack", "Heap", "Array"], ans: 1, exp: "A Stack follows LIFO — the last element pushed is the first to be popped." },
+  { q: "What is the worst-case time complexity of QuickSort?", opts: ["O(n log n)", "O(n)", "O(n²)", "O(log n)"], ans: 2, exp: "QuickSort degrades to O(n²) in the worst case when the pivot is always the smallest or largest element." },
+  { q: "Which traversal of a BST gives elements in sorted order?", opts: ["Pre-order", "Post-order", "In-order", "Level-order"], ans: 2, exp: "In-order traversal (left → root → right) of a BST produces elements in sorted ascending order." },
+  { q: "What data structure is used for BFS?", opts: ["Stack", "Queue", "Heap", "Graph"], ans: 1, exp: "BFS uses a Queue (FIFO) to explore nodes level by level." },
+  { q: "A complete binary tree with n nodes has height:", opts: ["O(n)", "O(log n)", "O(n²)", "O(1)"], ans: 1, exp: "A complete binary tree is perfectly balanced, giving height O(log n)." },
+  { q: "Which algorithm is used to find the shortest path in a weighted graph?", opts: ["BFS", "DFS", "Dijkstra's", "Prim's"], ans: 2, exp: "Dijkstra's algorithm finds the shortest path from a source to all vertices in a weighted graph with non-negative edges." },
+  { q: "What is the space complexity of Merge Sort?", opts: ["O(1)", "O(log n)", "O(n)", "O(n²)"], ans: 2, exp: "Merge Sort requires O(n) auxiliary space for the temporary arrays used during merging." },
+  { q: "Which data structure is best suited for implementing a priority queue?", opts: ["Linked List", "Array", "Heap", "Stack"], ans: 2, exp: "A Heap (min-heap or max-heap) allows O(log n) insert and O(1) peek, making it ideal for priority queues." },
+  { q: "What does 'amortized O(1)' mean for dynamic array insertion?", opts: ["Always O(1)", "On average O(1) over many operations", "Sometimes O(n)", "Never O(1)"], ans: 1, exp: "While a single insert can be O(n) during resizing, the average cost over all insertions is O(1) — this is amortized analysis." }
+];
+let current = 0, score = 0, answered = false;
+function render() {
+  if (current >= questions.length) { showScore(); return; }
+  const q = questions[current];
+  document.getElementById('qCounter').textContent = `Question ${current+1} of ${questions.length}`;
+  document.getElementById('progressBar').style.width = `${(current/questions.length)*100}%`;
+  const letters = ['A','B','C','D'];
+  document.getElementById('quizArea').innerHTML = `
+    <div class="question-card">
+      <div class="question-text">${q.q}</div>
+      <div class="options">${q.opts.map((o,i)=>`<div class="option" id="opt${i}" onclick="select(${i})"><span class="option-letter">${letters[i]}</span>${o}</div>`).join('')}</div>
+      <div class="explanation" id="exp">${q.exp}</div>
+    </div>
+    <div class="btn-row"><button class="btn btn-primary" id="nextBtn" onclick="next()" style="display:none">Next Question →</button></div>`;
+  answered = false;
+}
+function select(i) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  if (i === q.ans) { score++; document.getElementById(`opt${i}`).classList.add('correct'); }
+  else { document.getElementById(`opt${i}`).classList.add('wrong'); document.getElementById(`opt${q.ans}`).classList.add('correct'); }
+  document.getElementById('exp').style.display = 'block';
+  document.getElementById('nextBtn').style.display = 'inline-flex';
+}
+function next() { current++; render(); }
+function showScore() {
+  document.getElementById('quizArea').style.display = 'none';
+  document.getElementById('qCounter').style.display = 'none';
+  document.getElementById('progressBar').parentElement.style.display = 'none';
+  const sc = document.getElementById('scoreCard');
+  sc.style.display = 'block';
+  document.getElementById('scoreNum').textContent = `${score}/${questions.length}`;
+  document.getElementById('scoreLabel').textContent = 'Questions Correct';
+  const pct = (score/questions.length)*100;
+  document.getElementById('scoreMsg').textContent = pct>=80 ? '🎉 Excellent! You know your DSA well.' : pct>=50 ? '👍 Good effort! Keep practicing.' : '📚 Keep studying — you\'ll get there!';
+}
+function restartQuiz() { current=0; score=0; answered=false; document.getElementById('quizArea').style.display='block'; document.getElementById('qCounter').style.display='block'; document.getElementById('progressBar').parentElement.style.display='block'; document.getElementById('scoreCard').style.display='none'; render(); }
+render();
+</script>
+</body>
+</html>

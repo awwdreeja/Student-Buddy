@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Society Quiz – QuizVerse</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--accent:#38bdf8;--accent2:#7dd3fc;--bg:#0a0a0f;--surface:#13131a;--surface2:#1c1c27;--text:#f0f0f5;--muted:#7a7a9a;--border:rgba(255,255,255,0.07);--correct:#3ecf72;--wrong:#ff5252;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+  .grid-bg{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(56,189,248,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,0.04) 1px,transparent 1px);background-size:60px 60px;}
+  nav{position:relative;z-index:10;padding:1.25rem 2.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:1rem;}
+  .back-btn{display:inline-flex;align-items:center;gap:0.4rem;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:0.45rem 1rem;color:var(--text);text-decoration:none;font-size:0.85rem;transition:all 0.2s;}
+  .back-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .topic-badge{background:rgba(255,107,107,0.12);color:#ff6b6b;border:1px solid rgba(255,107,107,0.25);border-radius:20px;padding:0.3rem 0.9rem;font-size:0.75rem;font-family:'Syne',sans-serif;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+  main{position:relative;z-index:10;padding:2.5rem;max-width:780px;margin:0 auto;}
+  .topic-header{margin-bottom:2.5rem;}
+  .topic-header h1{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;letter-spacing:-1px;margin-top:0.75rem;}
+  .topic-header p{color:var(--muted);font-size:0.95rem;margin-top:0.4rem;}
+  .progress-bar-wrap{background:var(--surface2);border-radius:99px;height:6px;margin-bottom:2rem;overflow:hidden;}
+  .progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width 0.4s ease;}
+  .q-counter{font-size:0.8rem;color:var(--muted);margin-bottom:0.75rem;font-family:'Syne',sans-serif;}
+  .question-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:2rem;margin-bottom:1.25rem;}
+  .question-text{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:600;line-height:1.5;margin-bottom:1.5rem;}
+  .options{display:flex;flex-direction:column;gap:0.65rem;}
+  .option{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:0.85rem 1.1rem;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:0.75rem;font-size:0.95rem;}
+  .option:hover{border-color:rgba(56,189,248,0.4);background:rgba(56,189,248,0.06);}
+  .option.correct{border-color:var(--correct);background:rgba(62,207,114,0.1);color:var(--correct);}
+  .option.wrong{border-color:var(--wrong);background:rgba(255,82,82,0.1);color:var(--wrong);}
+  .option-letter{width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:0.75rem;font-weight:700;flex-shrink:0;}
+  .explanation{margin-top:1rem;background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.2);border-radius:10px;padding:0.9rem 1.1rem;font-size:0.88rem;color:var(--accent2);display:none;}
+  .btn-row{display:flex;gap:0.75rem;margin-top:1.25rem;}
+  .btn{padding:0.7rem 1.5rem;border-radius:10px;border:none;cursor:pointer;font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:600;transition:all 0.2s;}
+  .btn-primary{background:var(--accent);color:#0a0a0f;}
+  .btn-primary:hover{background:var(--accent2);}
+  .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);text-decoration:none;display:inline-flex;align-items:center;}
+  .btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+  .score-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:2.5rem;text-align:center;display:none;}
+  .score-num{font-family:'Syne',sans-serif;font-size:4rem;font-weight:800;color:var(--accent);}
+  .score-label{color:var(--muted);font-size:1rem;margin-top:0.3rem;}
+  .score-msg{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:600;margin-top:1rem;}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<nav>
+  <a class="back-btn" href="dashboard.html">← Dashboard</a>
+  <span class="topic-badge">✦ Non-Technical</span>
+</nav>
+<main>
+  <div class="topic-header">
+    <div>🏛️</div>
+    <h1>Society</h1>
+    <p>Test your knowledge of sociology, social structures, culture, and change.</p>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+  <div class="q-counter" id="qCounter">Question 1 of 10</div>
+  <div id="quizArea"></div>
+  <div class="score-card" id="scoreCard">
+    <div class="score-num" id="scoreNum"></div>
+    <div class="score-label" id="scoreLabel"></div>
+    <div class="score-msg" id="scoreMsg"></div>
+    <div class="btn-row" style="justify-content:center;margin-top:1.5rem">
+      <button class="btn btn-primary" onclick="restartQuiz()">Try Again</button>
+      <a class="btn btn-outline" href="dashboard.html">Dashboard</a>
+    </div>
+  </div>
+</main>
+<script>
+const questions=[
+  {q:"Who is considered the Father of Sociology?",opts:["Karl Marx","Max Weber","Émile Durkheim","Auguste Comte"],ans:3,exp:"Auguste Comte coined the term 'sociology' and is regarded as its founding father for systematically developing it as a science."},
+  {q:"What is socialisation?",opts:["Making friends","The process by which individuals learn cultural norms and values","Joining social media","Government social schemes"],ans:1,exp:"Socialisation is the lifelong process by which individuals learn and internalise the norms, values, and behaviours of their society."},
+  {q:"What does the term 'social stratification' refer to?",opts:["Movement between cities","The hierarchical arrangement of individuals in society","Gender equality","Economic growth"],ans:1,exp:"Social stratification refers to the ranking of individuals or groups in a society into layers based on wealth, power, prestige, or other criteria."},
+  {q:"Which sociologist introduced the concept of 'anomie'?",opts:["Max Weber","Karl Marx","Émile Durkheim","Talcott Parsons"],ans:2,exp:"Émile Durkheim introduced 'anomie' to describe a condition where social norms break down, leading to disorientation and deviance."},
+  {q:"What is a nuclear family?",opts:["Family with grandparents","Family with parents and dependent children only","Extended family","Single parent family"],ans:1,exp:"A nuclear family consists of two parents and their dependent children, living together as a basic social unit."},
+  {q:"What is ethnocentrism?",opts:["Study of ethnicity","Judging other cultures by one's own cultural standards","Respecting all cultures equally","Cultural exchange programs"],ans:1,exp:"Ethnocentrism is the tendency to view one's own culture as superior and use it as the standard to evaluate other cultures."},
+  {q:"Which term describes the movement of individuals or groups between social layers?",opts:["Social control","Social mobility","Social stratification","Social institution"],ans:1,exp:"Social mobility refers to the movement of individuals, families, or groups up or down the social hierarchy over time."},
+  {q:"Caste system in India is an example of which type of stratification?",opts:["Open stratification","Class-based stratification","Closed stratification","Meritocracy"],ans:2,exp:"The caste system is a form of closed stratification where one's social position is determined by birth and movement between castes is traditionally restricted."},
+  {q:"What is a social institution?",opts:["A government building","An established set of norms that fulfil basic social needs","A private company","A non-profit organisation"],ans:1,exp:"Social institutions are organised systems of social relationships and norms (like family, education, religion) that fulfil basic needs of society."},
+  {q:"Which theory views society as a system of interdependent parts working together?",opts:["Conflict Theory","Feminist Theory","Functionalism","Symbolic Interactionism"],ans:2,exp:"Functionalism, associated with Durkheim and Parsons, views society as a complex system where each part contributes to stability and social order."}
+];
+let current=0,score=0,answered=false;
+function render(){if(current>=questions.length){showScore();return;}const q=questions[current];document.getElementById('qCounter').textContent=`Question ${current+1} of ${questions.length}`;document.getElementById('progressBar').style.width=`${(current/questions.length)*100}%`;const letters=['A','B','C','D'];document.getElementById('quizArea').innerHTML=`<div class="question-card"><div class="question-text">${q.q}</div><div class="options">${q.opts.map((o,i)=>`<div class="option" id="opt${i}" onclick="select(${i})"><span class="option-letter">${letters[i]}</span>${o}</div>`).join('')}</div><div class="explanation" id="exp">${q.exp}</div></div><div class="btn-row"><button class="btn btn-primary" id="nextBtn" onclick="next()" style="display:none">Next Question →</button></div>`;answered=false;}
+function select(i){if(answered)return;answered=true;const q=questions[current];if(i===q.ans){score++;document.getElementById(`opt${i}`).classList.add('correct');}else{document.getElementById(`opt${i}`).classList.add('wrong');document.getElementById(`opt${q.ans}`).classList.add('correct');}document.getElementById('exp').style.display='block';document.getElementById('nextBtn').style.display='inline-flex';}
+function next(){current++;render();}
+function showScore(){document.getElementById('quizArea').style.display='none';document.getElementById('qCounter').style.display='none';document.getElementById('progressBar').parentElement.style.display='none';document.getElementById('scoreCard').style.display='block';document.getElementById('scoreNum').textContent=`${score}/${questions.length}`;document.getElementById('scoreLabel').textContent='Questions Correct';const pct=(score/questions.length)*100;document.getElementById('scoreMsg').textContent=pct>=80?'🎉 Sociologist in the making!':pct>=50?'👍 Good social awareness! Keep learning.':'📚 Explore more sociology concepts!';}
+function restartQuiz(){current=0;score=0;answered=false;document.getElementById('quizArea').style.display='block';document.getElementById('qCounter').style.display='block';document.getElementById('progressBar').parentElement.style.display='block';document.getElementById('scoreCard').style.display='none';render();}
+render();
+</script>
+</body>
+</html>
